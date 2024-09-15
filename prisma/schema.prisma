@@ -11,11 +11,49 @@ datasource db {
 }
 
 model User {
-  id        String  @id @default(cuid())
-  discordId String  @unique
+  id        String     @id @default(cuid())
+  discordId String     @unique
   name      String
-  email     String  @unique
+  email     String     @unique
   image     String
-  psn       String?
-  gamertag  String?
+  UserInfo  UserInfo[]
+}
+
+enum Gender {
+  male
+  female
+  unknown
+}
+
+enum Position {
+  left_wing
+  right_wing
+  left_defense
+  right_defense
+  center
+  goalie
+}
+
+enum Hand {
+  left
+  right
+}
+
+model UserInfo {
+  id                String   @id @default(cuid())
+  user              User     @relation(fields: [userId], references: [id])
+  userId            String
+  discordId         String
+  primaryConsole    String
+  psn               String?
+  gamertag          String?
+  eaId              String?
+  birthday          DateTime
+  gender            Gender
+  jerseyNumber      Int
+  primaryPosition   Position
+  secondaryPosition Position
+  city              String
+  shootingHand      Hand
+  phone             String?
 }

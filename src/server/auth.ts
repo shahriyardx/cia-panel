@@ -8,7 +8,7 @@ import {
 import DiscordProvider from "next-auth/providers/discord"
 
 import { env } from "@/env"
-import { DefaultJWT } from "next-auth/jwt"
+import { DefaultJWT, JWT } from "next-auth/jwt"
 import { db } from "./db"
 
 /**
@@ -20,7 +20,8 @@ import { db } from "./db"
 declare module "next-auth" {
 	interface Session extends DefaultSession {
 		user: User
-		connections: ConnectionsResponse
+		connections: Connection
+		token: JWT
 	}
 
 	interface User {
@@ -36,7 +37,7 @@ declare module "next-auth/jwt" {
 		access_token: string
 		refresh_token: string
 		expires_at: number
-		connections: ConnectionsResponse
+		connections: Connection
 	}
 }
 
@@ -52,7 +53,11 @@ type DiscordConnection = {
 	type: string
 }
 
-type ConnectionsResponse = DiscordConnection[]
+type Connection = {
+	ps?: string
+	xbox?: string
+	ea?: string
+}
 
 const refresh_discord_token = async (token: string) => {
 	const tokenUrl = "https://discord.com/api/oauth2/token"
@@ -83,7 +88,7 @@ const refresh_discord_token = async (token: string) => {
 	}
 }
 
-const fetchConnections = async (token: string) => {
+export const fetchConnections = async (token: string) => {
 	const response = await fetch(
 		"https://discord.com/api/users/@me/connections",
 		{
@@ -93,13 +98,15 @@ const fetchConnections = async (token: string) => {
 			},
 		},
 	)
-	const data = (await response.json()) as ConnectionsResponse
+	const data = (await response.json()) as DiscordConnection[]
 	const ps_connection = data.find((con) => con.type === "playstation")
 	const xbox_connection = data.find((con) => con.type === "xbox")
+	const ea_connection = data.find((con) => con.type === "ea")
 
 	const connections = {
-		psn: ps_connection?.name,
-		gamertag: xbox_connection?.name,
+		ps: ps_connection?.name,
+		xbox: xbox_connection?.name,
+		ea: ea_connection?.name,
 	}
 
 	return { connections, data }
@@ -117,16 +124,17 @@ export const authOptions: NextAuthOptions = {
 				...session,
 				user: token.user,
 				connections: token.connections,
+				token: token,
 			}
 		},
-		jwt: async ({ token, user, account }) => {
+		jwt: async ({ token, user, account, trigger }) => {
 			if (user && account) {
 				token.user = user
 				token.access_token = account.access_token as string
 				token.refresh_token = account.refresh_token as string
 				token.expires_at = (account.expires_at as number) * 1000
 
-				const { connections, data } = await fetchConnections(
+				const { connections } = await fetchConnections(
 					account.access_token as string,
 				)
 				const existingUser = await db.user.findUnique({
@@ -142,24 +150,19 @@ export const authOptions: NextAuthOptions = {
 							name: user.name as string,
 							email: user.email as string,
 							image: user.image,
-							psn: connections.psn,
-							gamertag: connections.gamertag,
-						},
-					})
-				} else {
-					await db.user.update({
-						where: {
-							id: existingUser.id,
-						},
-						data: {
-							psn: connections.psn,
-							gamertag: connections.gamertag,
 						},
 					})
 				}
 
-				token.connections = data
+				token.connections = connections
 				return token
+			}
+
+			if (trigger === "update") {
+				const { connections } = await fetchConnections(
+					token.access_token as string,
+				)
+				token.connections = connections
 			}
 
 			if (Date.now() > token.expires_at && token.expires_at) {
