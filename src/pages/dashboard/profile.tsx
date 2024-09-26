@@ -1,8 +1,9 @@
+import UserDashboard from '@/components/layouts/UserDashboard'
 import React from 'react'
 
 const ProfilePage = () => {
   return (
-    <div>ProfilePage</div>
+    <UserDashboard></UserDashboard>
   )
 }
 

@@ -22,6 +22,7 @@ declare module "next-auth" {
 		user: User
 		connections: Connection
 		token: JWT
+		is_admin: boolean
 	}
 
 	interface User {
@@ -34,6 +35,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
 	interface JWT extends DefaultJWT {
 		user: User
+		is_admin: boolean
 		access_token: string
 		refresh_token: string
 		expires_at: number
@@ -125,6 +127,7 @@ export const authOptions: NextAuthOptions = {
 				user: token.user,
 				connections: token.connections,
 				token: token,
+				is_admin: token.is_admin,
 			}
 		},
 		jwt: async ({ token, user, account, trigger }) => {
@@ -133,6 +136,10 @@ export const authOptions: NextAuthOptions = {
 				token.access_token = account.access_token as string
 				token.refresh_token = account.refresh_token as string
 				token.expires_at = (account.expires_at as number) * 1000
+
+				if (["810256917497905192", "696939596667158579"].includes(user.id)) {
+					token.is_admin = true
+				}
 
 				const { connections } = await fetchConnections(
 					account.access_token as string,

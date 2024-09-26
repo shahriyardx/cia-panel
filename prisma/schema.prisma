@@ -57,3 +57,9 @@ model UserInfo {
   shootingHand      Hand
   phone             String?
 }
+
+model Settings {
+  id    String @id @default(cuid())
+  npsso String
+  xapi  String
+}
