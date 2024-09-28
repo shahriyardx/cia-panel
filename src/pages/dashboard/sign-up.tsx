@@ -44,19 +44,22 @@ import { toast } from "sonner"
 
 const SignUpPage = () => {
 	const router = useRouter()
-	const { mutate: registerUser, isPending } =
-		api.verification.verify.useMutation({
-			onSuccess: () => {
-				toast.success("verification completed")
-			},
-			onError: (err) => {
-				toast.error(err.message)
-			},
-		})
+
+	const { data: userInfo } = api.signUp.info.useQuery()
+
+	const { mutate: registerUser, isPending } = api.signUp.signUp.useMutation({
+		onSuccess: () => {
+			toast.success("verification completed")
+			router.push("/dashboard/verification")
+		},
+		onError: (err) => {
+			toast.error(err.message)
+		},
+	})
 
 	const { data: session, update } = useSession({
 		required: true,
-		onUnauthenticated: () => router.push("/login"),
+		onUnauthenticated: () => router.push("/"),
 	})
 
 	const form = useForm<SignUpClient>({
@@ -68,17 +71,11 @@ const SignUpPage = () => {
 
 	const showButton = useMemo(() => {
 		if (!session) return false
-		if (
-			(primaryConsole === "playstation" || primaryConsole === "both") &&
-			!session.connections.ps
-		) {
+		if (primaryConsole === "playstation" && !session.connections.ps) {
 			return true
 		}
 
-		if (
-			(primaryConsole === "xbox" || primaryConsole === "both") &&
-			!session.connections.xbox
-		) {
+		if (primaryConsole === "xbox" && !session.connections.xbox) {
 			return true
 		}
 
@@ -101,6 +98,12 @@ const SignUpPage = () => {
 			form.setValue("gamertag", xbox)
 		}
 	}, [primaryConsole, session, form.setValue])
+
+	useEffect(() => {
+		if (userInfo) {
+			router.push("/dashboard/verification")
+		}
+	}, [userInfo, router])
 
 	return (
 		<div>
@@ -155,30 +158,14 @@ const SignUpPage = () => {
 													<IoLogoXbox /> XBox
 												</span>
 											</Radio>
-											<Radio
-												value="both"
-												className="cursor-pointer px-10 py-5 border rounded-md inline-block data-[checked]:border-primary"
-											>
-												<span className="flex items-center gap-2">
-													<IoLogoPlaystation />
-													<IoLogoXbox />
-													Both
-												</span>
-											</Radio>
 										</RadioGroup>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
 						/>
-						<div
-							className={cn(
-								"grid gap-5 grid-cols-1",
-								primaryConsole === "both" && "grid-cols-2",
-							)}
-						>
-							{(primaryConsole === "playstation" ||
-								primaryConsole === "both") && (
+						<div>
+							{primaryConsole === "playstation" && (
 								<FormField
 									control={form.control}
 									name="psn"
@@ -199,7 +186,7 @@ const SignUpPage = () => {
 								/>
 							)}
 
-							{(primaryConsole === "xbox" || primaryConsole === "both") && (
+							{primaryConsole === "xbox" && (
 								<FormField
 									control={form.control}
 									name="gamertag"
@@ -222,15 +209,14 @@ const SignUpPage = () => {
 						</div>
 
 						<div>
-							{(primaryConsole === "playstation" ||
-								primaryConsole === "both") && (
+							{primaryConsole === "playstation" && (
 								<UnavailableError
 									data={session?.connections?.ps}
 									message="Looks like you don't have your playstation account connected to your discord account. Please connect that before proceeding to the next step"
 								/>
 							)}
 
-							{(primaryConsole === "xbox" || primaryConsole === "both") && (
+							{primaryConsole === "xbox" && (
 								<UnavailableError
 									data={session?.connections?.xbox}
 									message="Looks like you don't have your xbox account connected to your discord account. Please connect that before proceeding to the next step"

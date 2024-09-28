@@ -1,7 +1,8 @@
 import { authRouter } from "@/server/api/routers/auth"
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc"
-import { verificationRouter } from "./routers/verification"
+import { signUpRouter } from "./routers/sign-up"
 import { settingsRouter } from "./routers/settings"
+import { verificationRouter } from "./routers/verification"
 
 /**
  * This is the primary router for your server.
@@ -10,8 +11,9 @@ import { settingsRouter } from "./routers/settings"
  */
 export const appRouter = createTRPCRouter({
 	auth: authRouter,
-	verification: verificationRouter,
+	signUp: signUpRouter,
 	settings: settingsRouter,
+	verification: verificationRouter,
 })
 
 // export type definition of API

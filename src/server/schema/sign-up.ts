@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 export const signUpSchemaClient = z.object({
-	primaryConsole: z.enum(["playstation", "xbox", "both"], {
+	primaryConsole: z.enum(["playstation", "xbox"], {
 		message: "please select primary console",
 	}),
 	psn: z.string().optional(),
@@ -56,7 +56,7 @@ export type SignUpClient = z.infer<typeof signUpSchemaClient>
 
 export const signUpSchema = z
 	.object({
-		primaryConsole: z.enum(["playstation", "xbox", "both"], {
+		primaryConsole: z.enum(["playstation", "xbox"], {
 			message: "please select primary console",
 		}),
 		psn: z.string().optional(),
@@ -120,14 +120,6 @@ export const signUpSchema = z
 				code: z.ZodIssueCode.custom,
 				message: "gamertag is required",
 				path: ["gamertag"],
-			})
-		}
-
-		if (primaryConsole === "both" && (!psn || !gamertag)) {
-			return rc.addIssue({
-				code: z.ZodIssueCode.custom,
-				message: "psn and gamertag both is required",
-				path: [!psn ? "psn" : "gamertag"],
 			})
 		}
 	})

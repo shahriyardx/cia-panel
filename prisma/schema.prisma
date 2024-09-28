@@ -46,7 +46,11 @@ model UserInfo {
   discordId         String
   primaryConsole    String
   psn               String?
+  psn_account_id    String?
+  psn_ip            String?
   gamertag          String?
+  xbox_account_id   String?
+  xbox_ip           String?
   eaId              String?
   birthday          DateTime
   gender            Gender

@@ -1,17 +1,31 @@
 import Image from "next/image"
 import Link from "next/link"
-import React from "react"
+import React, { useEffect } from "react"
 
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ArrowRight, ChevronLeft, Send } from "lucide-react"
 import StepOne from "@/components/shared/rules/step-one"
 import StepTwo from "@/components/shared/rules/step-two"
 import { toast } from "sonner"
+import { api } from "@/utils/api"
+import { useRouter } from "next/router"
 
 const ConsoleVerification = () => {
 	const [step, setStep] = React.useState(1)
 	const [isChecked, setIsChecked] = React.useState(false)
 
+	const router = useRouter()
+
+	const { data: userInfo, isLoading: userInfoLoading } =
+		api.signUp.info.useQuery()
+	const { mutate } = api.verification.shorten.useMutation()
+
+	useEffect(() => {
+		if (userInfoLoading) return
+		if (!userInfo) {
+			router.push("/dashboard/sign-up")
+		}
+	}, [userInfoLoading, router, userInfo])
 	return (
 		<div>
 			<div className="container mx-auto pt-10">
@@ -70,13 +84,19 @@ const ConsoleVerification = () => {
 						</p>
 
 						<div className="mt-3">
-							<Button>
+							<Button
+								onClick={() =>
+									mutate({
+										url: `${window.location.origin}/verify/${userInfo?.id}`,
+									})
+								}
+							>
 								<Send className="mr-2" size={15} />
 								Send Link
 							</Button>
 						</div>
 					</div>
-				)}
+				)},,,,,,,,,
 			</div>
 		</div>
 	)

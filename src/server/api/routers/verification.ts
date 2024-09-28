@@ -1,60 +1,37 @@
 import { z } from "zod"
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc"
-import { signUpSchema } from "@/server/schema/sign-up"
+import { env } from "@/env"
 import { TRPCError } from "@trpc/server"
 
 export const verificationRouter = createTRPCRouter({
-	verify: protectedProcedure
-		.input(signUpSchema)
-		.mutation(async ({ ctx, input }) => {
-			const userId = ctx.session.user.id
+	shorten: protectedProcedure
+		.input(
+			z.object({
+				url: z.string(),
+			}),
+		)
+		.mutation(async ({ input, ctx }) => {
+			const api_url = "https://i8.ae/api/url/add"
 
-			const user = await ctx.db.user.findFirst({
-				where: {
-					discordId: userId,
+			const response = await fetch(api_url, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${env.I8_API}`,
 				},
+				body: JSON.stringify({
+					url: input.url,
+				}),
 			})
 
-			if (!user) {
+			if (response.status !== 200) {
 				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "unable to register, please logout and relogin",
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Something went wrong please try again",
 				})
 			}
 
-			const data = await ctx.db.userInfo.findFirst({
-				where: {
-					discordId: userId,
-				},
-			})
-
-			if (data) {
-				throw new TRPCError({
-					code: "FORBIDDEN",
-					message: "you are already registered",
-				})
-			}
-
-			if (!data) {
-				await ctx.db.userInfo.create({
-					data: {
-						birthday: input.birthday,
-						city: input.city,
-						discordId: userId,
-						userId: user?.id as string,
-						gender: input.gender,
-						jerseyNumber: input.jerseyNumber,
-						primaryConsole: input.primaryConsole,
-						primaryPosition: input.primaryPosition,
-						secondaryPosition: input.secondaryPosition,
-						shootingHand: input.shootingHand,
-						eaId: input.eaId,
-						gamertag: input.gamertag,
-						phone: input.phone,
-						psn: input.psn,
-					},
-				})
-			}
+			const data = await response.json()
+			console.log(data)
 		}),
 })
