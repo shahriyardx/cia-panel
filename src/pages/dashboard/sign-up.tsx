@@ -41,6 +41,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { api } from "@/utils/api"
 import { toast } from "sonner"
+import PageHeader from "@/components/shared/header/page-header"
 
 const SignUpPage = () => {
 	const router = useRouter()
@@ -59,7 +60,7 @@ const SignUpPage = () => {
 
 	const { data: session, update } = useSession({
 		required: true,
-		onUnauthenticated: () => router.push("/"),
+		onUnauthenticated: () => router.push("/api/auth/signin"),
 	})
 
 	const form = useForm<SignUpClient>({
@@ -108,22 +109,15 @@ const SignUpPage = () => {
 	return (
 		<div>
 			<div className="container mx-auto pt-10">
-				<div className="flex items-center gap-2">
-					<Image src="/images/logo.png" width={80} height={80} alt="Logo" />
-					<div>
-						<p className="text-4xl font-extrabold">Covert Ice Alliance - CIA</p>
-						<p className="text-muted-foreground">
-							Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem,
-							modi.
-						</p>
-					</div>
-
-					<Button asChild className="ml-auto">
-						<Link href="/">
-							<ChevronLeft className="mr-2" /> Back to Home
-						</Link>
-					</Button>
-				</div>
+				<PageHeader
+					headerRight={
+						<Button asChild className="ml-auto">
+							<Link href="/">
+								<ChevronLeft className="mr-2" /> Back to Home
+							</Link>
+						</Button>
+					}
+				/>
 
 				<Form {...form}>
 					<form

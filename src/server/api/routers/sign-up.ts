@@ -3,6 +3,7 @@ import { signUpSchema } from "@/server/schema/sign-up"
 import { TRPCError } from "@trpc/server"
 import { env } from "@/env"
 import type { Settings } from "@prisma/client"
+import { z } from "zod"
 
 type AccountFindInfo = {
 	provider: "xbox" | "playstation"
@@ -36,7 +37,7 @@ const getAccountInfo = async ({
 	if (provider === "xbox") token = settings.xapi
 
 	const response = await fetch(
-		`${env.ACCOUNT_SERVICES_API}/${provider}/profile/${username}`,
+		`${env.ACCOUNT_SERVICES_API}/${provider}/profile/${username}/`,
 		{
 			headers: {
 				Authorization: token,
@@ -60,6 +61,21 @@ export const signUpRouter = createTRPCRouter({
 
 		return user
 	}),
+	infoByUserId: protectedProcedure
+		.input(
+			z.object({
+				userId: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const user = await ctx.db.userInfo.findFirst({
+				where: {
+					id: input.userId,
+				},
+			})
+
+			return user
+		}),
 	signUp: protectedProcedure
 		.input(signUpSchema)
 		.mutation(async ({ ctx, input }) => {
@@ -99,7 +115,7 @@ export const signUpRouter = createTRPCRouter({
 					message: "Something went wrong please try again",
 				})
 			}
-			console.log(input)
+
 			const accountInfo = await getAccountInfo({
 				provider: input.primaryConsole,
 				username:
@@ -146,6 +162,7 @@ export const signUpRouter = createTRPCRouter({
 						gamertag: input.gamertag,
 						phone: input.phone,
 						psn: input.psn,
+						console_verified: false,
 						...console_data,
 					},
 				})

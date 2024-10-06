@@ -22,14 +22,14 @@ const StepTwo = ({ agreed, setIsChecked, children }: Props) => {
 				<div className="grid gap-2">
 					<div>
 						<Label>
-							1. This is a non-toxic league. We are a brotherhood and
-							sisterhood. We are here for each other to create the best league.
+							1. This is a non-toxic league. We are here for each other to
+							create the best league.
 						</Label>
 
 						<ul className="text-sm mt-2">
 							<li>
-								<Dot className="inline-block text-primary" /> We have a 3 Strike
-								System.
+								<Dot className="inline-block text-primary" />
+								We have a 3 Strike System.
 							</li>
 							<li>
 								<Dot className="inline-block text-primary" />
@@ -44,7 +44,7 @@ const StepTwo = ({ agreed, setIsChecked, children }: Props) => {
 							<li>
 								<Dot className="inline-block text-primary" />
 								3rd strike will result in a Toxic Ban - this can be appealed and
-								bought out.
+								bought out. (If approved by League Leaders)
 							</li>
 						</ul>
 					</div>
@@ -93,7 +93,8 @@ const StepTwo = ({ agreed, setIsChecked, children }: Props) => {
 						<Label>9. Do not harmfully comment about the following:</Label>
 						<ul className="text-sm mt-2">
 							<li>
-								<Dot className="inline-block text-primary" /> Spouses
+								<Dot className="inline-block text-primary" />
+								Spouses
 							</li>
 							<li>
 								<Dot className="inline-block text-primary" />

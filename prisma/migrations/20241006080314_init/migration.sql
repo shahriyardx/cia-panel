@@ -25,7 +25,9 @@ CREATE TABLE "UserInfo" (
     "discordId" TEXT NOT NULL,
     "primaryConsole" TEXT NOT NULL,
     "psn" TEXT,
+    "psn_account_id" TEXT,
     "gamertag" TEXT,
+    "xbox_account_id" TEXT,
     "eaId" TEXT,
     "birthday" TIMESTAMP(3) NOT NULL,
     "gender" "Gender" NOT NULL,
@@ -35,8 +37,20 @@ CREATE TABLE "UserInfo" (
     "city" TEXT NOT NULL,
     "shootingHand" "Hand" NOT NULL,
     "phone" TEXT,
+    "console_verified" BOOLEAN NOT NULL DEFAULT false,
+    "console_ip" TEXT,
+    "console_agent" TEXT,
 
     CONSTRAINT "UserInfo_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Settings" (
+    "id" TEXT NOT NULL,
+    "npsso" TEXT NOT NULL,
+    "xapi" TEXT NOT NULL,
+
+    CONSTRAINT "Settings_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex

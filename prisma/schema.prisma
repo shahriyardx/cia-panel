@@ -47,10 +47,8 @@ model UserInfo {
   primaryConsole    String
   psn               String?
   psn_account_id    String?
-  psn_ip            String?
   gamertag          String?
   xbox_account_id   String?
-  xbox_ip           String?
   eaId              String?
   birthday          DateTime
   gender            Gender
@@ -60,6 +58,11 @@ model UserInfo {
   city              String
   shootingHand      Hand
   phone             String?
+
+  console_verified Boolean @default(false)
+  user_ip          String?
+  console_ip       String?
+  console_agent    String?
 }
 
 model Settings {

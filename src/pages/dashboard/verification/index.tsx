@@ -1,35 +1,59 @@
 import Image from "next/image"
 import Link from "next/link"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, ArrowRight, ChevronLeft, Send } from "lucide-react"
+import { ArrowLeft, ArrowRight, ChevronLeft, Loader2, Send } from "lucide-react"
 import StepOne from "@/components/shared/rules/step-one"
 import StepTwo from "@/components/shared/rules/step-two"
 import { toast } from "sonner"
 import { api } from "@/utils/api"
 import { useRouter } from "next/router"
+import PageHeader from "@/components/shared/header/page-header"
 
 const ConsoleVerification = () => {
-	const [step, setStep] = React.useState(1)
+	const [step, setStep] = useState(1)
+	const [loadingVerification, setLoadingVerification] = useState(false)
 	const [isChecked, setIsChecked] = React.useState(false)
 
 	const router = useRouter()
 
-	const { data: userInfo, isLoading: userInfoLoading } =
-		api.signUp.info.useQuery()
-	const { mutate } = api.verification.shorten.useMutation()
+	const {
+		data: userInfo,
+		isLoading: userInfoLoading,
+		refetch,
+	} = api.signUp.info.useQuery()
+	const { mutate } = api.message.sendMessage.useMutation({
+		onSuccess: () => {
+			toast.success("Link has been sent, Please check your console")
+			setLoadingVerification(true)
+			setStep((prev) => prev + 1)
+		},
+	})
 
 	useEffect(() => {
 		if (userInfoLoading) return
 		if (!userInfo) {
 			router.push("/dashboard/sign-up")
 		}
+
+		if (userInfo?.console_verified) {
+			router.push("/dashboard/verification/success")
+		}
 	}, [userInfoLoading, router, userInfo])
+
 	return (
 		<div>
 			<div className="container mx-auto pt-10">
-				<PageHeader />
+				<PageHeader
+					headerRight={
+						<Button asChild className="ml-auto">
+							<Link href="/">
+								<ChevronLeft className="mr-2" /> Back to Home
+							</Link>
+						</Button>
+					}
+				/>
 
 				{step === 1 && (
 					<StepOne>
@@ -85,41 +109,38 @@ const ConsoleVerification = () => {
 
 						<div className="mt-3">
 							<Button
-								onClick={() =>
+								onClick={() => {
 									mutate({
 										url: `${window.location.origin}/verify/${userInfo?.id}`,
 									})
-								}
+
+									fetch(`/api/verify/${userInfo?.id}/user`)
+								}}
 							>
 								<Send className="mr-2" size={15} />
 								Send Link
 							</Button>
 						</div>
 					</div>
-				)},,,,,,,,,
+				)}
+
+				{step >= 4 && loadingVerification && (
+					<div className="mt-5">
+						<p className="text-2xl font-bold flex items-center">
+							<Loader2 className="mr-2 animate-spin" />
+							<span>Verification Pending</span>
+						</p>
+
+						<p>Complete Verification on your console and get back to here.</p>
+
+						<Button onClick={() => refetch()} className="mt-2">
+							Done
+						</Button>
+					</div>
+				)}
 			</div>
 		</div>
 	)
 }
 
 export default ConsoleVerification
-
-const PageHeader = () => {
-	return (
-		<div className="flex items-center gap-2">
-			<Image src="/images/logo.png" width={80} height={80} alt="Logo" />
-			<div>
-				<p className="text-4xl font-extrabold">Covert Ice Alliance - CIA</p>
-				<p className="text-muted-foreground">
-					Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem, modi.
-				</p>
-			</div>
-
-			<Button asChild className="ml-auto">
-				<Link href="/">
-					<ChevronLeft className="mr-2" /> Back to Home
-				</Link>
-			</Button>
-		</div>
-	)
-}
