@@ -23,6 +23,7 @@ declare module "next-auth" {
 		connections: Connection
 		token: JWT
 		is_admin: boolean
+		ip?: string
 	}
 
 	interface User {
@@ -61,7 +62,7 @@ type Connection = {
 	ea?: string
 }
 
-const refresh_discord_token = async (token: string) => {
+export const refresh_discord_token = async (token: string) => {
 	const tokenUrl = "https://discord.com/api/oauth2/token"
 
 	const body = new URLSearchParams({
@@ -112,94 +113,4 @@ export const fetchConnections = async (token: string) => {
 	}
 
 	return { connections, data }
-}
-
-/**
- * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
- *
- * @see https://next-auth.js.org/configuration/options
- */
-export const authOptions: NextAuthOptions = {
-	callbacks: {
-		session: ({ session, token }) => {
-			return {
-				...session,
-				user: token.user,
-				connections: token.connections,
-				token: token,
-				is_admin: token.is_admin,
-			}
-		},
-		jwt: async ({ token, user, account, trigger }) => {
-			if (user && account) {
-				token.user = user
-				token.access_token = account.access_token as string
-				token.refresh_token = account.refresh_token as string
-				token.expires_at = (account.expires_at as number) * 1000
-
-				if (["810256917497905192", "696939596667158579"].includes(user.id)) {
-					token.is_admin = true
-				}
-
-				const { connections } = await fetchConnections(
-					account.access_token as string,
-				)
-				const existingUser = await db.user.findUnique({
-					where: {
-						discordId: user.id,
-					},
-				})
-
-				if (!existingUser) {
-					await db.user.create({
-						data: {
-							discordId: user.id,
-							name: user.name as string,
-							email: user.email as string,
-							image: user.image,
-						},
-					})
-				}
-
-				token.connections = connections
-				return token
-			}
-
-			if (trigger === "update") {
-				const { connections } = await fetchConnections(
-					token.access_token as string,
-				)
-				token.connections = connections
-			}
-
-			if (Date.now() > token.expires_at && token.expires_at) {
-				const { access_token, refresh_token, expires_at } =
-					await refresh_discord_token(token.refresh_token)
-
-				token.access_token = access_token
-				token.refresh_token = refresh_token
-				token.expires_at = expires_at
-			}
-
-			return token
-		},
-	},
-	providers: [
-		DiscordProvider({
-			clientId: env.DISCORD_CLIENT_ID,
-			clientSecret: env.DISCORD_CLIENT_SECRET,
-			authorization: {
-				params: {
-					scope: "identify connections email guilds",
-				},
-			},
-		}),
-	],
-}
-
-export const getServerAuthSession = (ctx: {
-	req: GetServerSidePropsContext["req"]
-	res: GetServerSidePropsContext["res"]
-}) => {
-	return getServerSession(ctx.req, ctx.res, authOptions)
 }

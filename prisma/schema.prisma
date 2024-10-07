@@ -17,6 +17,7 @@ model User {
   email     String     @unique
   image     String
   UserInfo  UserInfo[]
+  Logins    Logins[]
 }
 
 enum Gender {
@@ -84,4 +85,13 @@ model Roles {
   xbox                String
   signup_add_roles    String[]
   signup_remove_roles String[]
+}
+
+model Logins {
+  id     String   @id @default(cuid())
+  userId String
+  time   DateTime
+  ip     String
+
+  user User @relation(fields: [userId], references: [id])
 }
