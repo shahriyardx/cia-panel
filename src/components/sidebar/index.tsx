@@ -4,9 +4,9 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
 	ChevronDown,
-	Cog,
-	CogIcon,
 	Grid2X2,
+	Settings2,
+	UserRoundCog,
 	Variable,
 	type LucideIcon,
 } from "lucide-react"
@@ -35,7 +35,7 @@ const Sidebar = () => {
 							asChild
 						>
 							<div>
-								<CogIcon size={16} className="mr-2" />
+								<Settings2 size={16} className="mr-2" />
 								<span>Settings</span>
 								<ChevronDown
 									size={12}
@@ -48,6 +48,9 @@ const Sidebar = () => {
 						<div className="border-l">
 							<IconLink href="/admin/settings/credentials" Icon={Variable}>
 								<span>Credentials</span>
+							</IconLink>
+							<IconLink href="/admin/settings/roles" Icon={UserRoundCog}>
+								<span>Roles</span>
 							</IconLink>
 						</div>
 					</CollapsibleContent>

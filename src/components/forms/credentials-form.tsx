@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button"
 export const credentialsSchema = z.object({
 	npsso: z.string().min(1),
 	xapi: z.string().min(1),
+	support_server: z.string().min(1),
 })
 
 export type CredentialsType = z.infer<typeof credentialsSchema>
@@ -51,6 +52,20 @@ const CredentialsForm = ({ form, onSubmit }: Props) => {
 							<FormLabel>XAPI Key</FormLabel>
 							<FormControl>
 								<Input placeholder="Enter XAPI Key here" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="support_server"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Main Server ID</FormLabel>
+							<FormControl>
+								<Input placeholder="Main Server ID" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>

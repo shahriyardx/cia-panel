@@ -1,7 +1,6 @@
-import { z } from "zod"
-
 import { adminProcedure, createTRPCRouter } from "@/server/api/trpc"
 import { credentialsSchema } from "@/components/forms/credentials-form"
+import { roleSettingsSchema } from "@/pages/admin/settings/roles"
 
 export const settingsRouter = createTRPCRouter({
 	getSettings: adminProcedure.query(async ({ ctx }) => {
@@ -17,6 +16,10 @@ export const settingsRouter = createTRPCRouter({
 
 		return existing
 	}),
+	getRoleConfig: adminProcedure.query(async ({ ctx }) => {
+		const existing = await ctx.db.roles.findFirst()
+		return existing
+	}),
 	saveCredentials: adminProcedure
 		.input(credentialsSchema)
 		.mutation(async ({ ctx, input }) => {
@@ -28,5 +31,29 @@ export const settingsRouter = createTRPCRouter({
 				where: { id: existing.id },
 				data: input,
 			})
+		}),
+	saveRoleConfig: adminProcedure
+		.input(roleSettingsSchema)
+		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.db.roles.findFirst()
+			const normalizedData = {
+				...input.position_roles,
+				...input.console_roles,
+				signup_add_roles: input.signup_add_roles,
+				signup_remove_roles: input.signup_remove_roles,
+			}
+
+			if (!existing) {
+				await ctx.db.roles.create({
+					data: normalizedData,
+				})
+			} else {
+				await ctx.db.roles.update({
+					where: {
+						id: existing.id,
+					},
+					data: normalizedData,
+				})
+			}
 		}),
 })

@@ -30,6 +30,7 @@ const Credentials = () => {
 			form.reset({
 				npsso: settings.npsso,
 				xapi: settings.xapi,
+				support_server: settings.support_server,
 			})
 	}, [form, settings])
 

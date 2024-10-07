@@ -66,7 +66,22 @@ model UserInfo {
 }
 
 model Settings {
-  id    String @id @default(cuid())
-  npsso String
-  xapi  String
+  id             String @id @default(cuid())
+  npsso          String
+  xapi           String
+  support_server String @default("1283055660866600960")
+}
+
+model Roles {
+  id                  String   @id @default(cuid())
+  left_wing           String
+  right_wing          String
+  left_defense        String
+  right_defense       String
+  center              String
+  goalie              String
+  playstation         String
+  xbox                String
+  signup_add_roles    String[]
+  signup_remove_roles String[]
 }

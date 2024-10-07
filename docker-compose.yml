@@ -6,6 +6,6 @@ services:
       - POSTGRES_DATABASE=postgres
       - POSTGRES_USER=postgres
     ports:
-      - 5432:5432
+      - 5437:5432
     volumes:
       - ./database:/var/lib/postgresql/data
