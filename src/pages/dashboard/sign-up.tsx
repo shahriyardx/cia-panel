@@ -433,7 +433,7 @@ const SignUpPage = () => {
 							name="shootingHand"
 							render={({ field }) => (
 								<FormItem className="space-y-3">
-									<FormLabel>What hand do you play with?</FormLabel>
+									<FormLabel>What hand do you shoot with?</FormLabel>
 									<FormControl>
 										<RadioGroup
 											value={field.value}
