@@ -95,3 +95,9 @@ model Logins {
 
   user User @relation(fields: [userId], references: [id])
 }
+
+model Url {
+  id          String @id @default(cuid())
+  text        String @unique
+  destination String
+}
