@@ -1,4 +1,8 @@
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc"
+import {
+	adminProcedure,
+	createTRPCRouter,
+	protectedProcedure,
+} from "@/server/api/trpc"
 import { signUpSchema } from "@/server/schema/sign-up"
 import { TRPCError } from "@trpc/server"
 import { env } from "@/env"
@@ -50,6 +54,45 @@ const getAccountInfo = async ({
 }
 
 export const signUpRouter = createTRPCRouter({
+	allSubmissions: adminProcedure.query(async ({ ctx }) => {
+		const data = await ctx.db.userInfo.findMany({
+			include: {
+				user: {
+					select: {
+						name: true,
+						image: true,
+					},
+				},
+			},
+		})
+		return data || []
+	}),
+	submissionById: adminProcedure
+		.input(
+			z.object({
+				uid: z.string(),
+			}),
+		)
+		.query(async ({ ctx, input }) => {
+			const data = await ctx.db.userInfo.findFirst({
+				where: {
+					id: input.uid,
+				},
+				include: {
+					user: {
+						include: {
+							Logins: {
+								orderBy: {
+									time: "desc",
+								},
+								take: 5,
+							},
+						},
+					},
+				},
+			})
+			return data
+		}),
 	info: protectedProcedure.query(async ({ ctx }) => {
 		const userId = ctx.session.user.id
 

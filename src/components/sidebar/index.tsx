@@ -6,6 +6,7 @@ import {
 	ChevronDown,
 	Grid2X2,
 	Settings2,
+	User,
 	UserRoundCog,
 	Variable,
 	type LucideIcon,
@@ -26,6 +27,9 @@ const Sidebar = () => {
 			<div className="flex flex-col">
 				<IconLink href="/admin" Icon={Grid2X2}>
 					<span>Home</span>
+				</IconLink>
+				<IconLink href="/admin/users" Icon={User}>
+					<span>Users</span>
 				</IconLink>
 				<Collapsible>
 					<CollapsibleTrigger className="w-full">
