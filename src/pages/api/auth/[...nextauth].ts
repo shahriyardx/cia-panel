@@ -25,6 +25,7 @@ export const authOptions = ({ ip }: AuthOptionsProps) => {
 					token: token,
 					is_admin: token.is_admin,
 					ip: ip,
+					is_in_discord: token.is_in_discord,
 				}
 			},
 
@@ -34,6 +35,26 @@ export const authOptions = ({ ip }: AuthOptionsProps) => {
 					token.access_token = account.access_token as string
 					token.refresh_token = account.refresh_token as string
 					token.expires_at = (account.expires_at as number) * 1000
+
+					const settings = await db.settings.findFirst()
+
+					const response = await fetch(
+						`https://discord.com/api/users/@me/guilds`,
+						{
+							headers: {
+								Authorization: `Bearer ${account.access_token}`,
+								"User-Agent": "SlashCommands (https://ccbot.app, 1.0)",
+							},
+						},
+					)
+
+					const data = (await response.json()) as { id: string }[]
+
+					const is_in_discord = data.find(
+						(guild) => guild.id === settings?.support_server,
+					)
+
+					token.is_in_discord = !!is_in_discord
 
 					if (["810256917497905192", "696939596667158579"].includes(user.id)) {
 						token.is_admin = true

@@ -107,7 +107,7 @@ const SignUpPage = () => {
 	}, [userInfo, router])
 
 	return (
-		<div>
+		<>
 			<div className="container mx-auto pt-10">
 				<PageHeader
 					headerRight={
@@ -484,7 +484,7 @@ const SignUpPage = () => {
 					</form>
 				</Form>
 			</div>
-		</div>
+		</>
 	)
 }
 

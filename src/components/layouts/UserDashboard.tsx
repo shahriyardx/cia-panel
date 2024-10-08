@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react"
 import Sidebar from "../dashboard/Sidebar"
 import { ScrollArea } from "../ui/scroll-area"
+import RequireDiscord from "../shared/require-discord"
 
 const UserDashboard = ({ children }: { children?: ReactNode }) => {
 	return (

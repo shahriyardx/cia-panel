@@ -24,6 +24,7 @@ declare module "next-auth" {
 		token: JWT
 		is_admin: boolean
 		ip?: string
+		is_in_discord: boolean
 	}
 
 	interface User {
@@ -41,6 +42,7 @@ declare module "next-auth/jwt" {
 		refresh_token: string
 		expires_at: number
 		connections: Connection
+		is_in_discord: boolean
 	}
 }
 
