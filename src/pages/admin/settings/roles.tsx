@@ -134,7 +134,7 @@ const RoleSettings = ({ formData }: { formData: RoleSettings }) => {
 									name="position_roles.left_defense"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Left Defence</FormLabel>
+											<FormLabel>Left Defense</FormLabel>
 											<Select
 												onValueChange={field.onChange}
 												defaultValue={field.value}
@@ -162,7 +162,7 @@ const RoleSettings = ({ formData }: { formData: RoleSettings }) => {
 									name="position_roles.right_defense"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Right Defence</FormLabel>
+											<FormLabel>Right Defense</FormLabel>
 											<Select
 												onValueChange={field.onChange}
 												defaultValue={field.value}
