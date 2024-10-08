@@ -8,6 +8,15 @@ import React, { ReactNode } from "react"
 import { IoLogoXbox, IoLogoPlaystation } from "react-icons/io"
 import { FaDiscord } from "react-icons/fa"
 import { toast } from "sonner"
+import {
+	ColumnDef,
+	getCoreRowModel,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	useReactTable,
+} from "@tanstack/react-table"
+import { Logins } from "@prisma/client"
+import { DataTable } from "@/components/ui/data-table"
 
 const InfoSec = ({
 	title,
@@ -32,6 +41,19 @@ const UId = () => {
 			enabled: !!uid,
 		},
 	)
+
+	const columns: ColumnDef<Logins>[] = [
+		{ accessorKey: "ip", header: "IP Address" },
+		{ accessorKey: "time", header: "Time" },
+	]
+
+	const table = useReactTable({
+		columns,
+		data: info ? info.user.Logins : [],
+		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+	})
 
 	return (
 		<AdminDashboard>
@@ -103,7 +125,7 @@ const UId = () => {
 						<InfoSec title="User Info">
 							<p>Birthday: {info.birthday.toLocaleDateString()}</p>
 							<p>Gender: {info.gender}</p>
-							<p>Gender: {info.city}</p>
+							<p>City: {info.city}</p>
 							<p>Phone: {info.phone}</p>
 						</InfoSec>
 					</div>
@@ -114,6 +136,13 @@ const UId = () => {
 							<p>Secondary Position: {info.secondaryPosition}</p>
 							<p>Jersey Number: {info.jerseyNumber}</p>
 						</InfoSec>
+					</div>
+
+					<div className="mt-5">
+						<h1 className="text-2xl font-bold">Logins</h1>
+						<div className="mt-2">
+							<DataTable table={table} />
+						</div>
 					</div>
 				</div>
 			)}
