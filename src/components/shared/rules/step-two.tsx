@@ -1,6 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Dot } from "lucide-react"
+import { Check, Dot, Info, Minus } from "lucide-react"
 import React, { ReactNode } from "react"
 
 type Props = {
@@ -19,7 +19,7 @@ const StepTwo = ({ agreed, setIsChecked, children }: Props) => {
 			</p>
 
 			<div className="mt-5">
-				<div className="grid gap-2">
+				<div className="grid gap-1">
 					<div>
 						<Label>
 							1. This is a non-toxic league. We are here for each other to
@@ -27,22 +27,22 @@ const StepTwo = ({ agreed, setIsChecked, children }: Props) => {
 						</Label>
 
 						<ul className="text-sm mt-2">
-							<li>
-								<Dot className="inline-block text-primary" />
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								We have a 3 Strike System.
 							</li>
-							<li>
-								<Dot className="inline-block text-primary" />
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								1st strike is a warning (7 day mute) - this can be reduced with
 								a mute appeal and buyout.
 							</li>
-							<li>
-								<Dot className="inline-block text-primary" />
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								2nd strike is a (21 day mute) - this can be reduced with a mute
 								appeal and buyout.
 							</li>
-							<li>
-								<Dot className="inline-block text-primary" />
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								3rd strike will result in a Toxic Ban - this can be appealed and
 								bought out. (If approved by League Leaders)
 							</li>
@@ -91,25 +91,25 @@ const StepTwo = ({ agreed, setIsChecked, children }: Props) => {
 
 					<div>
 						<Label>9. Do not harmfully comment about the following:</Label>
-						<ul className="text-sm mt-2">
-							<li>
-								<Dot className="inline-block text-primary" />
+						<ul className="text-sm mt-1">
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								Spouses
 							</li>
-							<li>
-								<Dot className="inline-block text-primary" />
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								Children
 							</li>
-							<li>
-								<Dot className="inline-block text-primary" />
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								Mothers
 							</li>
-							<li>
-								<Dot className="inline-block text-primary" />
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								Sexual Orientation/Preference
 							</li>
-							<li>
-								<Dot className="inline-block text-primary" />
+							<li className="flex  items-center gap-2">
+								<Minus className="text-muted-foreground" size={14} />
 								Race
 							</li>
 						</ul>

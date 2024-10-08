@@ -8,38 +8,52 @@ type Props = {
 const StepOne = ({ children }: Props) => {
 	return (
 		<div className="mt-5">
-			<p className="text-lg font-extrabold">
-				IF YOU DO NOT FOLLOW EACH STEP SPECIFICALLY AND GET BANNED THROUGH
-				VERIFICATION YOU WILL HAVE TO APPEAL YOUR BAN AND PAY TO BE UNBANNED
-			</p>
+			<fieldset className="border p-5 rounded-md">
+				<legend className="px-4 text-2xl font-bold">
+					PLEASE REVIEW THE FOLLOWING INSTRUCTIONS CAREFULLY ⚠️
+				</legend>
 
-			<p className="text-lg font-extrabold mt-3">
-				YOU ARE AGREEING AND CONSENTING TO RULES AND DATA ACQUIRED. WE HAVE ZERO
-				TOLERANCE AND WILL GIVE NO LEEWAY.
-			</p>
+				<div>
+					<p>
+						Failure to follow each step precisely may result in a ban during the
+						verification process. If banned, you will need to appeal and
+						potentially pay to be reinstated. Please read the steps and rules so
+						that you are aware of what you need to do and what is expected in
+						our league.
+					</p>
 
-			<div className="mt-5">
-				<p className="underline">A few things before we get started</p>
-				<ul>
-					<li className="flex items-center gap-2">
-						<Check className="text-primary" size={14} /> You must be home and
-						connected to your home internet to verify.
-					</li>
-					<li className="flex items-center gap-2">
-						<Check className="text-primary" size={14} /> You must have access to
-						the internet from your home.
-					</li>
-					<li className="flex items-center gap-2">
-						<Check className="text-primary" size={14} /> You must have your
-						video game console available and connected to your home internet!
-					</li>
-				</ul>
-				<p className="mt-2">
-					We hope you believe in what we are building and hope you want to be a
-					part of it. If you can meet each objective above, Please Click
-					Continue.
-				</p>
-			</div>
+					<p className="mt-3">
+						By proceeding, you agree to our rules and consent to the data
+						collected. We have a strict zero-tolerance policy — no exceptions will
+						be made.
+					</p>
+
+					<h3 className="font-bold mt-5">
+						Important Guidelines Before You Begin:
+					</h3>
+
+					<ul className="mt-2">
+						<li className="flex items-center gap-2">
+							<Check className="text-primary text-green-500" size={14} /> You
+							must be home and connected to your home internet to verify.
+						</li>
+						<li className="flex items-center gap-2">
+							<Check className="text-primary text-green-500" size={14} /> You
+							must have access to the internet from your home.
+						</li>
+						<li className="flex items-center gap-2">
+							<Check className="text-primary text-green-500" size={14} /> You
+							must have your video game console available and connected to your
+							home internet!
+						</li>
+					</ul>
+
+					<p className="mt-5">
+						We believe in what we're building and hope you share our vision. If
+						you can meet the above requirements, please click "Next."
+					</p>
+				</div>
+			</fieldset>
 
 			<div>{children}</div>
 		</div>
