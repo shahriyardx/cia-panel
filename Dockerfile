@@ -15,7 +15,6 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN yarn prisma generate
-RUN yarn prisma db push
 RUN yarn build
 
 FROM base AS runner
@@ -36,4 +35,4 @@ USER nextjs
 EXPOSE 3000
 ENV PORT=3000
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "npx prisma db push && node server.js"]
