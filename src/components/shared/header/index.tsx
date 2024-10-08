@@ -23,7 +23,6 @@ import Link from "next/link"
 
 const Header = () => {
 	const { data, status } = useSession()
-	console.log(data)
 
 	return (
 		<div>

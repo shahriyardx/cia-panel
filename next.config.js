@@ -17,6 +17,7 @@ const config = {
 		locales: ["en"],
 		defaultLocale: "en",
 	},
+	output: "standalone",
 	transpilePackages: ["geist"],
 	typescript: {
 		ignoreBuildErrors: true,

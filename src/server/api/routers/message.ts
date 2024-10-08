@@ -25,7 +25,6 @@ export const getShortUrl = async (url: string) => {
 	}
 
 	const data = await response.json()
-	console.log(data)
 	return `${env.URL_SHORT_API}/${data.text}`
 }
 

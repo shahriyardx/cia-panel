@@ -80,9 +80,9 @@ export default async function handler(
 
 	roles_to_add.push(...config.signup_add_roles)
 	roles_to_remove.push(...config.signup_remove_roles)
-	console.log(roles_to_add)
+
 	roles_to_add.forEach(async (role) => {
-		const resp = await fetch(
+		await fetch(
 			`https://discord.com/api/v10/guilds/${settings.support_server}/members/${data.discordId}/roles/${role}`,
 			{
 				method: "PUT",
@@ -92,8 +92,6 @@ export default async function handler(
 				},
 			},
 		)
-
-		console.log(resp.status, resp.statusText, role)
 	})
 
 	roles_to_remove.forEach(async (role) => {
