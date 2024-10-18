@@ -189,7 +189,13 @@ const Header = () => {
 								<DropdownMenuLabel>{data.user.name}</DropdownMenuLabel>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem>Profile</DropdownMenuItem>
-								<DropdownMenuItem>Dashboard</DropdownMenuItem>
+								<DropdownMenuItem
+									onSelect={() =>
+										router.push(data.is_admin ? "/admin" : "/dashboard")
+									}
+								>
+									Dashboard
+								</DropdownMenuItem>
 								<DropdownMenuItem
 									className="bg-destructive"
 									onSelect={() => signOut()}

@@ -37,7 +37,7 @@ import {
 	SignUp,
 	SignUpClient,
 	signUpSchemaClient,
-} from "@/server/schema/sign-up"
+} from "@/server/schema/sign-up.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { api } from "@/utils/api"
 import { toast } from "sonner"

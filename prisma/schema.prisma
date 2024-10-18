@@ -41,10 +41,12 @@ enum Hand {
 }
 
 model UserInfo {
-  id                String   @id @default(cuid())
-  user              User     @relation(fields: [userId], references: [id])
-  userId            String
-  discordId         String
+  id        String @id @default(cuid())
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String
+  discordId String
+  blazeId   String
+
   primaryConsole    String
   psn               String?
   psn_account_id    String?
@@ -64,13 +66,21 @@ model UserInfo {
   user_ip          String?
   console_ip       String?
   console_agent    String?
+
+  season      Season        @relation(fields: [seasonId], references: [id])
+  seasonId    String
+  MatchPLayer MatchPLayer[]
+
+  createdAt DateTime @default(now())
 }
 
 model Settings {
-  id             String @id @default(cuid())
+  id             String  @id @default(cuid())
   npsso          String
   xapi           String
-  support_server String @default("1283055660866600960")
+  support_server String  @default("1283055660866600960")
+  currentSeason  Season? @relation(fields: [seasonId], references: [id])
+  seasonId       String?
 }
 
 model Roles {
@@ -90,7 +100,7 @@ model Roles {
 model Logins {
   id     String   @id @default(cuid())
   userId String
-  time   DateTime
+  time   DateTime @default(now())
   ip     String
 
   user User @relation(fields: [userId], references: [id])
@@ -100,4 +110,173 @@ model Url {
   id          String @id @default(cuid())
   text        String @unique
   destination String
+}
+
+model InviteCode {
+  id     String @id @default(cuid())
+  code   String
+  userId String @unique
+}
+
+model Season {
+  id          String        @id @default(cuid())
+  name        String
+  Settings    Settings[]
+  MatchPLayer MatchPLayer[]
+  MatchClub   MatchClub[]
+  Match       Match[]
+  UserInfo    UserInfo[]
+
+  createdAt DateTime @default(now())
+}
+
+model Club {
+  id     String @id @default(cuid())
+  clubId String
+
+  name  String
+  image String
+  Match Match[]
+
+  createdAt DateTime @default(now())
+}
+
+model Match {
+  id      String @id @default(cuid())
+  matchId String
+
+  club   Club   @relation(fields: [clubId], references: [id])
+  clubId String
+
+  season   Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  timestamp   String
+  clubs       MatchClub[]
+  homeGoal    String
+  awayGoal    String
+  MatchPLayer MatchPLayer[]
+
+  createdAt DateTime @default(now())
+}
+
+enum MatchSide {
+  home
+  away
+}
+
+model MatchClub {
+  id String @id @default(cuid())
+
+  match   Match  @relation(fields: [matchId], references: [id])
+  matchId String
+
+  season   Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  goals               String
+  goalsAgainst        String
+  clubDivision        String
+  cNhlOnlineGameType  String
+  garaw               String
+  gfraw               String
+  losses              String
+  memberString        String
+  opponentClubId      String
+  opponentScore       String
+  opponentTeamArtAbbr String
+  passa               String
+  passc               String
+  ppg                 String
+  ppo                 String
+  result              String
+  score               String
+  scoreString         String
+  shots               String
+  teamArtAbbr         String
+  teamSide            MatchSide
+  toa                 String
+  winnerByDnf         String
+  winnerByGoalieDnf   String
+
+  createdAt DateTime @default(now())
+}
+
+model MatchPLayer {
+  id String @id @default(cuid())
+
+  match   Match  @relation(fields: [matchId], references: [id])
+  matchId String
+
+  season   Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  user   UserInfo @relation(fields: [userId], references: [id])
+  userId String
+
+  blazeId            String
+  class              String
+  glbrksavepct       String
+  glbrksaves         String
+  glbrkshots         String
+  gldsaves           String
+  glga               String
+  glgaa              String
+  glpensavepct       String
+  glpensaves         String
+  glpenshots         String
+  glpkclearzone      String
+  glpokechecks       String
+  glsavepct          String
+  glsaves            String
+  glshots            String
+  glsoperiods        String
+  isGuest            String
+  opponentClubId     String
+  opponentScore      String
+  opponentTeamId     String
+  player_dnf         String
+  playerLevel        String
+  pNhlOnlineGameType String
+  position           String
+  posSorted          String
+  ratingDefense      String
+  ratingOffense      String
+  ratingTeamplay     String
+  score              String
+  skassists          String
+  skbs               String
+  skdeflections      String
+  skfol              String
+  skfopct            String
+  skfow              String
+  skgiveaways        String
+  skgoals            String
+  skgwg              String
+  skhits             String
+  skinterceptions    String
+  skpassattempts     String
+  skpasses           String
+  skpasspct          String
+  skpenaltiesdrawn   String
+  skpim              String
+  skpkclearzone      String
+  skplusmin          String
+  skpossession       String
+  skppg              String
+  sksaucerpasses     String
+  skshg              String
+  skshotattempts     String
+  skshotonnetpct     String
+  skshotpct          String
+  skshots            String
+  sktakeaways        String
+  teamId             String
+  teamSide           String
+  toi                String
+  toiseconds         String
+  playername         String
+  clientPlatform     String
+
+  createdAt DateTime @default(now())
 }

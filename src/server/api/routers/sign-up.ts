@@ -3,7 +3,7 @@ import {
 	createTRPCRouter,
 	protectedProcedure,
 } from "@/server/api/trpc"
-import { signUpSchema } from "@/server/schema/sign-up"
+import { signUpSchema } from "@/server/schema/sign-up.schema"
 import { TRPCError } from "@trpc/server"
 import { env } from "@/env"
 import type { Settings } from "@prisma/client"
@@ -137,6 +137,27 @@ export const signUpRouter = createTRPCRouter({
 				})
 			}
 
+			const console_name =
+				input.primaryConsole === "playstation" ? input.psn : input.gamertag
+			const blazeResponse = await fetch(
+				`https://proclubs.ea.com/api/nhl/members/search?platform=common-gen5&memberName=${console_name}`,
+			)
+			const blazeData = (await blazeResponse.json()) as {
+				members: { blazeId: string; name: string }[]
+			}
+
+			const actual = blazeData.members.find(
+				(member) => member.name === console_name,
+			)
+
+			if (!actual) {
+				throw new TRPCError({
+					code: "FORBIDDEN",
+					message:
+						"Unable to find your EA Player ID, Please create a player in World of Chel that you use in PIN Games.",
+				})
+			}
+
 			const data = await ctx.db.userInfo.findFirst({
 				where: {
 					discordId: userId,
@@ -206,6 +227,8 @@ export const signUpRouter = createTRPCRouter({
 						phone: input.phone,
 						psn: input.psn,
 						console_verified: false,
+						blazeId: actual.blazeId,
+						seasonId: settings.seasonId as string,
 						...console_data,
 					},
 				})

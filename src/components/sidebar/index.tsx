@@ -4,10 +4,12 @@ import { Button, type ButtonProps } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
 	ChevronDown,
+	Disc2,
 	Grid2X2,
 	Settings2,
 	User,
 	UserRoundCog,
+	UsersRound,
 	Variable,
 	type LucideIcon,
 } from "lucide-react"
@@ -30,6 +32,12 @@ const Sidebar = () => {
 				</IconLink>
 				<IconLink href="/admin/users" Icon={User}>
 					<span>Users</span>
+				</IconLink>
+				<IconLink href="/admin/seasons" Icon={Disc2}>
+					<span>Seasons</span>
+				</IconLink>
+				<IconLink href="/admin/clubs" Icon={UsersRound}>
+					<span>Clubs</span>
 				</IconLink>
 				<Collapsible>
 					<CollapsibleTrigger className="w-full">
