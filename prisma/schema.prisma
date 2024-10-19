@@ -138,8 +138,9 @@ model Club {
   name  String
   image String
 
-  createdAt DateTime    @default(now())
-  MatchClub MatchClub[]
+  createdAt   DateTime    @default(now())
+  matchesHome MatchClub[] @relation("HomeClub")
+  matchesAway MatchClub[] @relation("AwayClub")
 }
 
 model Match {
@@ -167,11 +168,11 @@ enum MatchSide {
 model MatchClub {
   id String @id @default(cuid())
 
-  club        Club @relation(fields: [clubId], references: [id])
-  clubAgainst Club @relation(fields: [clubAgainstId], references: [id])
+  clubId String
+  club   Club   @relation("HomeClub", fields: [clubId], references: [id])
 
-  clubId        String
   clubAgainstId String
+  clubAgainst   Club   @relation("AwayClub", fields: [clubAgainstId], references: [id])
 
   match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
   matchId String
