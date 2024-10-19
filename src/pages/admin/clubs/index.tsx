@@ -65,6 +65,9 @@ const Seasons = () => {
 				image: "",
 			})
 		},
+		onError: (error) => {
+			toast.error(error.message)
+		},
 	})
 
 	const { mutate: deleteClub } = api.club.deleteClub.useMutation({

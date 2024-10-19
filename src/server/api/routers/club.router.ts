@@ -6,6 +6,7 @@ import {
 	publicProcedure,
 } from "@/server/api/trpc"
 import { clubSchema } from "@/server/schema/club.schema"
+import { TRPCError } from "@trpc/server"
 export const clubRouter = createTRPCRouter({
 	createClub: adminProcedure
 		.input(clubSchema)
@@ -25,6 +26,17 @@ export const clubRouter = createTRPCRouter({
 				})
 
 				return { message: "club updated" }
+			}
+
+			const response = await fetch(
+				`https://proclubs.ea.com/api/nhl/clubs/info?platform=common-gen5&clubIds=${input.clubId}`,
+			)
+
+			if (response.status !== 200) {
+				throw new TRPCError({
+					code: "NOT_FOUND",
+					message: `unable to find club with id ${input.clubId}`,
+				})
 			}
 
 			await ctx.db.club.create({ data: input })

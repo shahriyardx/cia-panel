@@ -133,7 +133,7 @@ model Season {
 
 model Club {
   id     String @id @default(cuid())
-  clubId String
+  clubId String @unique
 
   name  String
   image String
@@ -160,19 +160,14 @@ model Match {
   createdAt DateTime @default(now())
 }
 
-enum MatchSide {
-  home
-  away
-}
-
 model MatchClub {
   id String @id @default(cuid())
 
   clubId String
-  club   Club   @relation("HomeClub", fields: [clubId], references: [id])
+  club   Club   @relation("HomeClub", fields: [clubId], references: [clubId])
 
   clubAgainstId String
-  clubAgainst   Club   @relation("AwayClub", fields: [clubAgainstId], references: [id])
+  clubAgainst   Club   @relation("AwayClub", fields: [clubAgainstId], references: [clubId])
 
   match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
   matchId String
@@ -200,7 +195,7 @@ model MatchClub {
   scoreString         String
   shots               String
   teamArtAbbr         String
-  teamSide            MatchSide
+  teamSide            String
   toa                 String
   winnerByDnf         String
   winnerByGoalieDnf   String
