@@ -81,6 +81,7 @@ model Settings {
   support_server String  @default("1283055660866600960")
   currentSeason  Season? @relation(fields: [seasonId], references: [id], onDelete: SetNull)
   seasonId       String?
+  pullGames      Boolean @default(true)
 }
 
 model Roles {
@@ -128,7 +129,8 @@ model Season {
   Match       Match[]
   UserInfo    UserInfo[]
 
-  createdAt DateTime @default(now())
+  createdAt     DateTime            @default(now())
+  SeasonalStats ClubSeasonalStats[]
 }
 
 model Club {
@@ -138,9 +140,31 @@ model Club {
   name  String
   image String
 
-  createdAt   DateTime    @default(now())
-  matchesHome MatchClub[] @relation("HomeClub")
-  matchesAway MatchClub[] @relation("AwayClub")
+  createdAt     DateTime            @default(now())
+  matchesHome   MatchClub[]         @relation("HomeClub")
+  matchesAway   MatchClub[]         @relation("AwayClub")
+  ClubStats     ClubStats[]
+  SeasonalStats ClubSeasonalStats[]
+}
+
+model ClubSeasonalStats {
+  id     String @id @default(cuid())
+  club   Club   @relation(fields: [clubId], references: [id])
+  clubId String
+
+  season   Season @relation(fields: [seasonId], references: [id])
+  seasonId String
+
+  points Int @default(0)
+  otl    Int @default(0)
+  adj    Int @default(0)
+}
+
+model ClubStats {
+  id     String @id @default(cuid())
+  club   Club   @relation(fields: [clubId], references: [id])
+  clubId String
+  points Int
 }
 
 model Match {
@@ -157,6 +181,9 @@ model Match {
   clubs   MatchClub[]
   players MatchPlayer[]
 
+  is_lagout Boolean @default(false)
+  is_ot     Boolean @default(false)
+
   createdAt DateTime @default(now())
 }
 
@@ -167,7 +194,7 @@ model MatchClub {
   club   Club   @relation("HomeClub", fields: [clubId], references: [clubId])
 
   clubAgainstId String
-  clubAgainst   Club   @relation("AwayClub", fields: [clubAgainstId], references: [clubId])
+  clubAgainst   Club   @relation("AwayClub", fields: [clubAgainstId], references: [clubId], onDelete: Cascade)
 
   match   Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
   matchId String
@@ -200,7 +227,8 @@ model MatchClub {
   winnerByDnf         String
   winnerByGoalieDnf   String
 
-  createdAt DateTime @default(now())
+  createdAt DateTime      @default(now())
+  players   MatchPlayer[]
 }
 
 model MatchPlayer {
@@ -214,6 +242,9 @@ model MatchPlayer {
 
   user   UserInfo @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+
+  club   MatchClub @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId String
 
   blazeId            String
   class              String

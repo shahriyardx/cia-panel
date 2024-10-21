@@ -4,22 +4,105 @@ import React, { useState } from "react"
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { boolean } from "zod"
+import { z } from "zod"
+import { api } from "@/utils/api"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form"
+import { toast } from "sonner"
+import {
+	ColumnDef,
+	getCoreRowModel,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	useReactTable,
+} from "@tanstack/react-table"
+import { inferRouterOutputs } from "@trpc/server"
+import { AppRouter } from "@/server/api/root"
+import { DataTable } from "@/components/ui/data-table"
+
+export const seasonSchema = z.object({
+	name: z.string().min(1),
+	playOff: z.boolean().default(false),
+	default: z.boolean().default(false),
+})
+
+export type SeasonCreateType = z.infer<typeof seasonSchema>
 
 const Seasons = () => {
-	const [s, sets] = useState("")
-	const [def, setDef] = useState(false)
+	const form = useForm<SeasonCreateType>({
+		resolver: zodResolver(seasonSchema),
+	})
 
 	const [open, setOpen] = useState(false)
+
+	const { data: seasons } = api.season.seasons.useQuery()
+	const { mutate: createSeason } = api.season.createSeason.useMutation({
+		onSuccess: () => {
+			toast.success("Season Created")
+			setOpen(false)
+			form.reset({
+				name: "",
+				playOff: false,
+				default: false,
+			})
+		},
+		onError: (error) => {
+			toast.error(error.message)
+		},
+	})
+
+	const handleSubmit = (values: SeasonCreateType) => {
+		createSeason(values)
+	}
+
+	const columns: ColumnDef<
+		inferRouterOutputs<AppRouter>["season"]["seasons"][number]
+	>[] = [
+		{
+			accessorKey: "name",
+		},
+		{
+			accessorKey: "playOff",
+			cell: ({ row }) => {
+				return row.original.playOff ? "Yes" : "No"
+			},
+		},
+		{
+			header: "Actions",
+			cell: () => {
+				return (
+					<div className="flex gap-2">
+						<Button variant="secondary">Set Default</Button>
+						<Button variant="destructive">Delete</Button>
+					</div>
+				)
+			},
+		},
+	]
+
+	const table = useReactTable({
+		columns,
+		data: seasons ?? [],
+		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
+	})
 
 	return (
 		<AdminDashboard>
@@ -27,58 +110,91 @@ const Seasons = () => {
 				<div className="flex justify-between">
 					<h1 className="text-2xl font-bold">Seasons</h1>
 
-					<Button onClick={() => setOpen(true)}>New Season</Button>
 					<Dialog open={open} onOpenChange={(val) => setOpen(val)}>
+						<DialogTrigger>
+							<Button>New Season</Button>
+						</DialogTrigger>
 						<DialogContent className="sm:max-w-[425px]">
 							<DialogHeader>
 								<DialogTitle>Create New Season</DialogTitle>
 							</DialogHeader>
 
 							<div>
-								<div className="flex flex-col gap-2">
-									<Input
-										id="name"
-										value={s}
-										onChange={(e) => sets(e.target.value)}
-										placeholder="Season Name"
-										className="col-span-3"
-									/>
-								</div>
+								<Form {...form}>
+									<form className="space-y-5">
+										<FormField
+											control={form.control}
+											name="name"
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Season Name</FormLabel>
+													<FormControl>
+														<Input placeholder="Season Name" {...field} />
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
 
-								<div className="mt-2">
-									<Label htmlFor="def" className="text-right"></Label>
-									<div className="col-span-3 flex items-center gap-2">
-										<Checkbox
-											checked={def}
-											onCheckedChange={(val) => setDef(Boolean(val))}
-											id="def"
+										<FormField
+											control={form.control}
+											name="default"
+											render={({ field }) => (
+												<FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+													<FormControl>
+														<Checkbox
+															checked={field.value}
+															onCheckedChange={field.onChange}
+														/>
+													</FormControl>
+													<div className="space-y-1 leading-none">
+														<FormLabel>Default Season</FormLabel>
+														<FormDescription>
+															will make this season default
+														</FormDescription>
+													</div>
+												</FormItem>
+											)}
 										/>
-										<label htmlFor="def" className="text-muted-foreground">
-											Default Season
-										</label>
-									</div>
-								</div>
-								<div className="mt-2">
-									<Label htmlFor="def" className="text-right"></Label>
-									<div className="col-span-3 flex items-center gap-2">
-										<Checkbox
-											checked={def}
-											onCheckedChange={(val) => setDef(Boolean(val))}
-											id="def"
+
+										<FormField
+											control={form.control}
+											name="playOff"
+											render={({ field }) => (
+												<FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+													<FormControl>
+														<Checkbox
+															checked={field.value}
+															onCheckedChange={field.onChange}
+														/>
+													</FormControl>
+													<div className="space-y-1 leading-none">
+														<FormLabel>Playoff</FormLabel>
+														<FormDescription>
+															will make this season playoff
+														</FormDescription>
+													</div>
+												</FormItem>
+											)}
 										/>
-										<label htmlFor="def" className="text-muted-foreground">
-											is Playoff
-										</label>
-									</div>
-								</div>
+									</form>
+								</Form>
 							</div>
 							<DialogFooter>
-								<Button type="button">Save changes</Button>
+								<Button type="button" onClick={form.handleSubmit(handleSubmit)}>
+									Save changes
+								</Button>
 							</DialogFooter>
 						</DialogContent>
 					</Dialog>
 				</div>
 			</PageTitle>
+
+			<div>
+				<div>
+					<DataTable table={table} />
+				</div>
+			</div>
 		</AdminDashboard>
 	)
 }

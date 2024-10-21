@@ -1,6 +1,7 @@
 import { adminProcedure, createTRPCRouter } from "@/server/api/trpc"
 import { credentialsSchema } from "@/components/forms/credentials-form"
 import { roleSettingsSchema } from "@/pages/admin/settings/roles"
+import { settingSchema } from "@/pages/admin/settings"
 
 export const settingsRouter = createTRPCRouter({
 	getSettings: adminProcedure.query(async ({ ctx }) => {
@@ -27,6 +28,21 @@ export const settingsRouter = createTRPCRouter({
 			if (!existing) {
 				return await ctx.db.settings.create({ data: input })
 			}
+			return await ctx.db.settings.update({
+				where: { id: existing.id },
+				data: input,
+			})
+		}),
+	saveSettings: adminProcedure
+		.input(settingSchema)
+		.mutation(async ({ ctx, input }) => {
+			const existing = await ctx.db.settings.findFirst()
+			if (!existing) {
+				return await ctx.db.settings.create({
+					data: { ...input, npsso: "", xapi: "" },
+				})
+			}
+
 			return await ctx.db.settings.update({
 				where: { id: existing.id },
 				data: input,

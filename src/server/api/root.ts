@@ -4,6 +4,7 @@ import { signUpRouter } from "./routers/sign-up"
 import { settingsRouter } from "./routers/settings"
 import { messageRouter } from "./routers/message"
 import { clubRouter } from "./routers/club.router"
+import { seasonRouter } from "./routers/season.router"
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
 	settings: settingsRouter,
 	message: messageRouter,
 	club: clubRouter,
+	season: seasonRouter,
 })
 
 // export type definition of API
