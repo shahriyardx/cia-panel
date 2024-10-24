@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Ticket" ADD COLUMN     "step" INTEGER NOT NULL DEFAULT 1;

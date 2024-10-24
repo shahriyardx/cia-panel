@@ -50,6 +50,9 @@ export const signUpSchemaClient = z.object({
 			"invalid phone number",
 		)
 		.optional(),
+	inviterId: z
+		.string({ message: "please select who invited you" })
+		.min(1, { message: "please select who invited you" }),
 })
 
 export type SignUpClient = z.infer<typeof signUpSchemaClient>
@@ -105,6 +108,9 @@ export const signUpSchema = z
 				"invalid phone number",
 			)
 			.optional(),
+		inviterId: z
+			.string({ message: "please select who invited you" })
+			.min(1, { message: "please select who invited you" }),
 	})
 	.superRefine(({ primaryConsole, psn, gamertag }, rc) => {
 		if (primaryConsole === "playstation" && !psn) {

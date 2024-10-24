@@ -40,12 +40,22 @@ enum Hand {
   right
 }
 
+model Ticket {
+  id         String   @id @default(cuid())
+  user_id    String
+  channel_id String
+  message_id String
+  time       DateTime
+  step       Int @default(1)
+}
+
 model UserInfo {
   id        String @id @default(cuid())
   user      User   @relation(fields: [userId], references: [id])
   userId    String
   discordId String
   blazeId   String
+  inviterId String
 
   primaryConsole    String
   psn               String?

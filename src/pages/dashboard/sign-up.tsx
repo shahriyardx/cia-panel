@@ -1,13 +1,20 @@
 import Image from "next/image"
 import Link from "next/link"
-import React, { useEffect, useMemo } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { CalendarIcon, ChevronLeft, Loader2 } from "lucide-react"
+import {
+	CalendarIcon,
+	Check,
+	ChevronLeft,
+	ChevronsUpDown,
+	Loader2,
+} from "lucide-react"
 import { useForm } from "react-hook-form"
 import {
 	Form,
 	FormControl,
+	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -42,25 +49,68 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { api } from "@/utils/api"
 import { toast } from "sonner"
 import PageHeader from "@/components/shared/header/page-header"
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@/components/ui/command"
+
+type DiscordMember = {
+	id: string
+	name: string
+}
+
+type Member = {
+	label: string
+	value: string
+}
 
 const SignUpPage = () => {
+	const { data: session, update } = useSession({
+		required: true,
+		onUnauthenticated: () => router.push("/api/auth/signin"),
+	})
+
+	const [members, setMembers] = useState<Member[]>([])
 	const router = useRouter()
 
 	const { data: userInfo } = api.signUp.info.useQuery()
 
 	const { mutate: registerUser, isPending } = api.signUp.signUp.useMutation({
-		onSuccess: () => {
-			toast.success("verification completed")
+		onSuccess: (data) => {
+			if (data && session) {
+				fetch(`http://localhost:5000/add-to-server/`, {
+					method: "PUT",
+					headers: {
+						access_token: session.token.access_token,
+					},
+					body: JSON.stringify({
+						user_id: data.discordId,
+					}),
+				})
+					.then((response) => response.json())
+					.then(() => {
+						fetch(`http://localhost:5000/create-ticket/`, {
+							method: "POST",
+							headers: {
+								"Content-Type": "application/json",
+							},
+							body: JSON.stringify({
+								user_id: data.id,
+							}),
+						})
+					})
+			}
+
+			toast.success("signup completed")
 			router.push("/dashboard/verification")
 		},
 		onError: (err) => {
 			toast.error(err.message)
 		},
-	})
-
-	const { data: session, update } = useSession({
-		required: true,
-		onUnauthenticated: () => router.push("/api/auth/signin"),
 	})
 
 	const form = useForm<SignUpClient>({
@@ -87,8 +137,10 @@ const SignUpPage = () => {
 		const actualValues = {
 			...values,
 			psn: session?.connections.ps,
-			gamertag: session?.connections.xbox,
+			// gamertag: session?.connections.xbox,
+			gamertag: "graetscottie",
 		}
+		console.log(actualValues)
 		registerUser(actualValues)
 	}
 
@@ -105,6 +157,21 @@ const SignUpPage = () => {
 			router.push("/dashboard/verification")
 		}
 	}, [userInfo, router])
+
+	useEffect(() => {
+		fetch(`http://localhost:5000/members/`)
+			.then((response) => response.json())
+			.then((data) => {
+				const members = data.members as DiscordMember[]
+
+				setMembers(
+					members.map((member) => ({
+						label: member.name,
+						value: member.id,
+					})),
+				)
+			})
+	}, [])
 
 	return (
 		<>
@@ -472,6 +539,86 @@ const SignUpPage = () => {
 											placeholder="Enter your phone number. (optional)"
 										/>
 									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="inviterId"
+							render={({ field }) => (
+								<FormItem className="flex flex-col">
+									<FormLabel>WHo invited you?</FormLabel>
+									<Popover>
+										<PopoverTrigger asChild>
+											<FormControl>
+												<Button
+													variant="outline"
+													role="combobox"
+													className={cn(
+														"justify-between",
+														!field.value && "text-muted-foreground",
+													)}
+												>
+													{field.value
+														? members.find(
+																(language) => language.value === field.value,
+															)?.label
+														: "Select Member"}
+													<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+												</Button>
+											</FormControl>
+										</PopoverTrigger>
+										<PopoverContent className="p-0">
+											<Command>
+												<CommandInput placeholder="Search member..." />
+												<CommandList>
+													<CommandEmpty>No member found.</CommandEmpty>
+													<CommandGroup>
+														<CommandItem
+															value={"810256917497905192"}
+															onSelect={() => {
+																form.setValue("inviterId", "810256917497905192")
+															}}
+														>
+															<Check
+																className={cn(
+																	"mr-2 h-4 w-4",
+																	field.value === "810256917497905192"
+																		? "opacity-100"
+																		: "opacity-0",
+																)}
+															/>
+															No one invited me
+														</CommandItem>
+														{members.map((language) => (
+															<CommandItem
+																value={language.label}
+																key={language.value}
+																onSelect={() => {
+																	form.setValue("inviterId", language.value)
+																}}
+															>
+																<Check
+																	className={cn(
+																		"mr-2 h-4 w-4",
+																		language.value === field.value
+																			? "opacity-100"
+																			: "opacity-0",
+																	)}
+																/>
+																{language.label}
+															</CommandItem>
+														))}
+													</CommandGroup>
+												</CommandList>
+											</Command>
+										</PopoverContent>
+									</Popover>
+									<FormDescription>
+										The person who invited you to this league
+									</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}

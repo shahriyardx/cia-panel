@@ -210,7 +210,7 @@ export const signUpRouter = createTRPCRouter({
 			}
 
 			if (!data) {
-				await ctx.db.userInfo.create({
+				return await ctx.db.userInfo.create({
 					data: {
 						birthday: input.birthday,
 						city: input.city,
@@ -229,6 +229,7 @@ export const signUpRouter = createTRPCRouter({
 						console_verified: false,
 						blazeId: actual.blazeId,
 						seasonId: settings.seasonId as string,
+						inviterId: input.inviterId,
 						...console_data,
 					},
 				})
